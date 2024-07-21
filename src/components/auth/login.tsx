@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { redirect } from 'next/navigation';
+import { sendRequest } from '../../../utils/api';
 
 type FieldType = {
   email?: string;
@@ -29,19 +30,25 @@ const Login = () => {
 
   const onFinish = async (values: FieldType) => {
     console.log('Success:', values);
-    let res = await fetch(`${process.env.customURL}/auth/login`, {
+    // let res = await fetch(`${process.env.customURL}/auth/login`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     email: values.email,
+    //     password: values.password,
+    //   }),
+    // });
+    // res = await res.json();
+    // console.log('🚀 ~ onFinish ~ res:', res);
+
+    const res = await sendRequest<IBackendRes<IUser>>({
+      url: `${process.env.customURL}/auth/login`,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-      }),
+      body: { email: values.email, password: values.password },
     });
-    res = await res.json();
-    console.log('🚀 ~ onFinish ~ res:', res);
-    //@ts-ignore
+
     if (res?.data?.accessToken) {
       await fetch('/api/auth', {
         method: 'POST',
